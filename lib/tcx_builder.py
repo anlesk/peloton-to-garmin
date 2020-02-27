@@ -23,11 +23,15 @@ def getHeartRate(heartRate):
 def getCadence(cadence):
     return "{0:.0f}".format(cadence)
 
-def getSpeedInMetersPerSecond(speedInMilesPerHour):
-    metersPerHour = speedInMilesPerHour * METERS_PER_MILE
+def getSpeedInMetersPerSecond(speedInKilometersPerHour):
+    metersPerHour = speedInKilometersPerHour * 1000
     metersPerMinute = metersPerHour / 60
     metersPerSecond = metersPerMinute / 60
     return str(metersPerSecond)
+
+def getSpeedInMetersPerSecondFromMilesPerHour(speedInMilesPerHour):
+    kmPerHour = speedInMilesPerHour * METERS_PER_MILE / 1000
+    return getSpeedInMetersPerSecond(kmPerHour)
 
 def workoutSamplesToTCX(workout, workoutSummary, workoutSamples, outputDir):
 
@@ -58,12 +62,12 @@ def workoutSamplesToTCX(workout, workoutSummary, workoutSamples, outputDir):
     lap.attrib = dict(StartTime=getTimeStamp(startTimeInSeconds))
 
     totalTimeSeconds = etree.Element("TotalTimeSeconds")
-    totalTimeSeconds.text = str(workout["peloton"]["ride"]["duration"])
+    totalTimeSeconds.text = str(workout["ride"]["duration"])
 
     try:
         distanceMeters = etree.Element("DistanceMeters")
-        miles = workoutSamples["summaries"][1]["value"]
-        totalMeters = miles * METERS_PER_MILE
+        km = workoutSamples["summaries"][1]["value"]
+        totalMeters = km * 1000
         distanceMeters.text = "{0:.1f}".format(totalMeters)
     except Exception as e:
             logger.error("Failed to Parse Distance - Exception: {}".format(e))
@@ -71,7 +75,7 @@ def workoutSamplesToTCX(workout, workoutSummary, workoutSamples, outputDir):
 
     try:
         maximumSpeed = etree.Element("MaximumSpeed")
-        maximumSpeed.text = getSpeedInMetersPerSecond(workoutSummary["max_speed"])
+        maximumSpeed.text = getSpeedInMetersPerSecondFromMilesPerHour(workoutSummary["max_speed"])
 
         calories = etree.Element("Calories")
         calories.text = str(int(round((workoutSummary["calories"]))))
@@ -89,7 +93,7 @@ def workoutSamplesToTCX(workout, workoutSummary, workoutSamples, outputDir):
         extensions = etree.Element("Extensions")
         lx = etree.Element("{http://www.garmin.com/xmlschemas/ActivityExtension/v2}LX")
         avgSpeed = etree.Element("{http://www.garmin.com/xmlschemas/ActivityExtension/v2}AvgSpeed")
-        avgSpeed.text = getSpeedInMetersPerSecond(workoutSummary["avg_speed"])
+        avgSpeed.text = getSpeedInMetersPerSecondFromMilesPerHour(workoutSummary["avg_speed"])
         maxBikeCadence = etree.Element("{http://www.garmin.com/xmlschemas/ActivityExtension/v2}MaxBikeCadence")
         maxBikeCadence.text = getCadence(workoutSummary["max_cadence"])
         avgWatts = etree.Element("{http://www.garmin.com/xmlschemas/ActivityExtension/v2}AvgWatts")
@@ -199,11 +203,9 @@ def workoutSamplesToTCX(workout, workoutSummary, workoutSamples, outputDir):
     tree = etree.ElementTree(root)
 
     instructor = ""
-    if workout['peloton']['ride']['instructor'] is not None:
-        instructor = " with " + workout['peloton']["ride"]["instructor"]["first_name"] + " " + workout['peloton']["ride"]["instructor"]["last_name"]
+    # if workout['ride']['instructor'] is not None:
+    #     instructor = " with " + workout["ride"]["instructor"]["first_name"] + " " + workout["ride"]["instructor"]["last_name"]
     
-    cleanedTitle = workout["ride"]["title"].replace("/","-").replace(":","-")
-
-    filename = "{0}-{1}{2}-{3}.tcx".format(startTimeInSeconds, cleanedTitle, instructor, workout['id'])
+    filename = "{0}-{1}{2}-{3}.tcx".format(startTimeInSeconds, workout["ride"]["title"], instructor, workout['id'])
     outputDir = outputDir.replace("\"", "")
     tree.write("{0}/{1}".format(outputDir,filename), xml_declaration=True, encoding="UTF-8", method="xml")
