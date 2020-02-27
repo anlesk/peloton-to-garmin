@@ -41,6 +41,7 @@ def workoutSamplesToTCX(workout, workoutSummary, workoutSamples, outputDir):
         return
 
     startTimeInSeconds = workout['start_time']
+    ride = workout["ride"] if not workout["peloton"] else workout["peloton"]["ride"]
 
     etree.register_namespace("","http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2")
     etree.register_namespace("activityExtensions", "http://www.garmin.com/xmlschemas/ActivityExtension/v2")    
@@ -76,8 +77,8 @@ def workoutSamplesToTCX(workout, workoutSummary, workoutSamples, outputDir):
         totalMeters = distance * rate
         distanceMeters.text = "{0:.1f}".format(totalMeters)
     except Exception as e:
-            logger.error("Failed to Parse Distance - Exception: {}".format(e))
-            return
+        logger.error("Failed to Parse Distance - Exception: {}".format(e))
+        return
 
     try:
         maximumSpeed = etree.Element("MaximumSpeed")
@@ -214,10 +215,10 @@ def workoutSamplesToTCX(workout, workoutSummary, workoutSamples, outputDir):
     tree = etree.ElementTree(root)
 
     instructor = ""
-    # if workout['peloton']['ride']['instructor'] is not None:
-    #     instructor = " with " + workout['peloton']["ride"]["instructor"]["first_name"] + " " + workout['peloton']["ride"]["instructor"]["last_name"]
+    if ride['instructor'] is not None:
+        instructor = " with " + ride["instructor"]["first_name"] + " " + ride["instructor"]["last_name"]
     
-    cleanedTitle = workout["ride"]["title"].replace("/","-").replace(":","-")
+    cleanedTitle = ride["title"].replace("/","-").replace(":","-")
 
     filename = "{0}-{1}{2}-{3}.tcx".format(startTimeInSeconds, cleanedTitle, instructor, workout['id'])
     outputDir = outputDir.replace("\"", "")
