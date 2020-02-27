@@ -215,7 +215,7 @@ def workoutSamplesToTCX(workout, workoutSummary, workoutSamples, outputDir):
     tree = etree.ElementTree(root)
 
     instructor = ""
-    if ride['instructor'] is not None:
+    if not ride['instructor']:
         instructor = " with " + ride["instructor"]["first_name"] + " " + ride["instructor"]["last_name"]
     
     cleanedTitle = ride["title"].replace("/","-").replace(":","-")
