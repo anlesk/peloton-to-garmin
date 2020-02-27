@@ -9,6 +9,7 @@ import logging
 logger = logging.getLogger('peloton-to-garmin.Tcx_Builder')
 
 METERS_PER_MILE = 1609.34
+isMetric = True;
 
 def getTimeStamp(timeInSeconds):
     timestamp = datetime.fromtimestamp(timeInSeconds, timezone.utc)
@@ -66,8 +67,13 @@ def workoutSamplesToTCX(workout, workoutSummary, workoutSamples, outputDir):
 
     try:
         distanceMeters = etree.Element("DistanceMeters")
-        km = workoutSamples["summaries"][1]["value"]
-        totalMeters = km * 1000
+        rate = 1000;
+        distance = workoutSamples["summaries"][1]["value"];
+        
+        if not isMetric:
+            rate = METERS_PER_MILE;
+
+        totalMeters = distance * rate
         distanceMeters.text = "{0:.1f}".format(totalMeters)
     except Exception as e:
             logger.error("Failed to Parse Distance - Exception: {}".format(e))
@@ -100,6 +106,11 @@ def workoutSamplesToTCX(workout, workoutSummary, workoutSamples, outputDir):
         avgWatts.text = "{0:.0f}".format(workoutSummary["avg_power"])
         maxWatts = etree.Element("{http://www.garmin.com/xmlschemas/ActivityExtension/v2}MaxWatts")
         maxWatts.text = "{0:.0f}".format(workoutSummary["max_power"])
+
+        if not isMetric:
+            maximumSpeed.text = getSpeedInMetersPerSecond(workoutSummary["max_speed"]);
+            avgSpeed.text = getSpeedInMetersPerSecond(workoutSummary["avg_speed"])
+
         lx.append(avgSpeed)
         lx.append(maxBikeCadence)
         lx.append(avgWatts)
@@ -203,9 +214,11 @@ def workoutSamplesToTCX(workout, workoutSummary, workoutSamples, outputDir):
     tree = etree.ElementTree(root)
 
     instructor = ""
-    # if workout['ride']['instructor'] is not None:
-    #     instructor = " with " + workout["ride"]["instructor"]["first_name"] + " " + workout["ride"]["instructor"]["last_name"]
+    # if workout['peloton']['ride']['instructor'] is not None:
+    #     instructor = " with " + workout['peloton']["ride"]["instructor"]["first_name"] + " " + workout['peloton']["ride"]["instructor"]["last_name"]
     
-    filename = "{0}-{1}{2}-{3}.tcx".format(startTimeInSeconds, workout["ride"]["title"], instructor, workout['id'])
+    cleanedTitle = workout["ride"]["title"].replace("/","-").replace(":","-")
+
+    filename = "{0}-{1}{2}-{3}.tcx".format(startTimeInSeconds, cleanedTitle, instructor, workout['id'])
     outputDir = outputDir.replace("\"", "")
     tree.write("{0}/{1}".format(outputDir,filename), xml_declaration=True, encoding="UTF-8", method="xml")
