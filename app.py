@@ -120,6 +120,3 @@ def main():
 
     if pause_on_finish == "true":
         input("Press the <ENTER> key to continue...")
-
-if __name__ == "__main__":
-    main()
