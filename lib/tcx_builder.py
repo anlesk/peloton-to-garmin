@@ -34,14 +34,13 @@ def getSpeedInMetersPerSecondFromMilesPerHour(speedInMilesPerHour):
     kmPerHour = speedInMilesPerHour * METERS_PER_MILE / 1000
     return getSpeedInMetersPerSecond(kmPerHour)
 
-def workoutSamplesToTCX(workout, workoutSummary, workoutSamples, outputDir):
+def workoutSamplesToTCX(workout, workoutSummary, workoutSamples):
 
     if(workoutSamples is None):
         logger.error("No workout sample data.") 
         return
 
     startTimeInSeconds = workout['start_time']
-    ride = workout["ride"] if not workout["peloton"] else workout["peloton"]["ride"]
 
     etree.register_namespace("","http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2")
     etree.register_namespace("activityExtensions", "http://www.garmin.com/xmlschemas/ActivityExtension/v2")    
@@ -213,13 +212,6 @@ def workoutSamplesToTCX(workout, workoutSummary, workoutSamples, outputDir):
     activities.append(activity)
     root.append(activities)
     tree = etree.ElementTree(root)
+    stringSource = etree.tostring(root, encoding="UTF-8", method="xml");
 
-    instructor = ""
-    if not ride['instructor']:
-        instructor = " with " + ride["instructor"]["first_name"] + " " + ride["instructor"]["last_name"]
-    
-    cleanedTitle = ride["title"].replace("/","-").replace(":","-")
-
-    filename = "{0}-{1}{2}-{3}.tcx".format(startTimeInSeconds, cleanedTitle, instructor, workout['id'])
-    outputDir = outputDir.replace("\"", "")
-    tree.write("{0}/{1}".format(outputDir,filename), xml_declaration=True, encoding="UTF-8", method="xml")
+    return stringSource;

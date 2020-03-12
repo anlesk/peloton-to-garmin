@@ -2,6 +2,7 @@ import os
 import importlib  
 
 from flask import Flask
+from flask import request
 
 ptg = importlib.import_module("peloton-to-garmin")
 
@@ -12,9 +13,11 @@ def hello_world():
     target = os.environ.get('TARGET', 'World')
     return 'Hello {}!\n'.format(target)
 
-@app.route('/peloton')
+@app.route('/peloton', methods = ['POST'])
 def runExport():
-    ptg.main();
+    email = request.form.get('email')
+    password = request.form.get('password')
+    ptg.getWorkouts(email, password);
     return 'success';
 
 if __name__ == "__main__":

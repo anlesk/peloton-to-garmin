@@ -1,4 +1,4 @@
-FROM python:latest
+FROM python:3.7-slim
 
 ENV NUM_ACTIVITIES=5
 ENV OUTPUT_DIRECTORY="/output"
@@ -9,5 +9,5 @@ COPY . /opt/app
 WORKDIR /opt/app
 RUN pip install -r requirements.txt
 
-CMD python peloton-to-garmin.py
-
+EXPOSE 8080
+CMD python webServer.py

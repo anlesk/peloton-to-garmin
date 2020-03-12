@@ -1,4 +1,4 @@
 requests
 ConfigParser
 Flask
-gunicorn
+garmin-uploader
