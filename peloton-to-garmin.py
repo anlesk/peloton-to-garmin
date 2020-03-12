@@ -61,21 +61,6 @@ logger.debug("Peloton to Garmin Magic :)")
 ##############################
 # Environment Variables Setup
 ##############################
-if len(sys.argv) > 2:
-    user_email = sys.argv[1]
-    user_password = sys.argv[2]
-else:
-    if config.ConfigSectionMap("PELOTON")['email'] is None:
-        logger.error("Please specify your Peloton login email in the config.ini file.")
-        sys.exit(1)
-
-    if config.ConfigSectionMap("PELOTON")['password'] is None:
-        logger.error("Please specify your Peloton login password in the config.ini file.")
-        sys.exit(1)
-
-user_email = config.ConfigSectionMap("PELOTON")['email']
-user_password = config.ConfigSectionMap("PELOTON")['password']
-
 pathToToken = os.getenv("GCS_TOKEN_PATH") or config.ConfigSectionMap("OUTPUT")['gcptokenpath'];
 numActivities = os.getenv("NUM_ACTIVITIES") or 5;
 output_directory = os.getenv("OUTPUT_DIRECTORY") or config.ConfigSectionMap("OUTPUT")['directory'];
@@ -150,4 +135,19 @@ def getWorkouts(email = None, password = None):
         input("Press the <ENTER> key to continue...")
 
 if __name__ == "__main__":
+    if len(sys.argv) > 2:
+        user_email = sys.argv[1]
+        user_password = sys.argv[2]
+    else:
+        if config.ConfigSectionMap("PELOTON")['email'] is None:
+            logger.error("Please specify your Peloton login email in the config.ini file.")
+            sys.exit(1)
+
+        if config.ConfigSectionMap("PELOTON")['password'] is None:
+            logger.error("Please specify your Peloton login password in the config.ini file.")
+            sys.exit(1)
+
+    user_email = config.ConfigSectionMap("PELOTON")['email']
+    user_password = config.ConfigSectionMap("PELOTON")['password']
+    
     getWorkouts(user_email, user_password);
