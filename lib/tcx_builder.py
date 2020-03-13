@@ -212,6 +212,6 @@ def workoutSamplesToTCX(workout, workoutSummary, workoutSamples):
     activities.append(activity)
     root.append(activities)
     tree = etree.ElementTree(root)
-    stringSource = etree.tostring(root, encoding="UTF-8", method="xml");
+    stringSource = etree.tostring(tree.getroot(), encoding="utf-8", method="xml").decode();
 
     return stringSource;

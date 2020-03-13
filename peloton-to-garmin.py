@@ -61,7 +61,7 @@ logger.debug("Peloton to Garmin Magic :)")
 ##############################
 # Environment Variables Setup
 ##############################
-pathToToken = os.getenv("GCS_TOKEN_PATH") or config.ConfigSectionMap("OUTPUT")['gcptokenpath'];
+pathToToken = os.getenv("GCS_TOKEN_PATH") or config.ConfigSectionMap("OUTPUT").get('gcptokenpath');
 numActivities = os.getenv("NUM_ACTIVITIES") or 5;
 output_directory = os.getenv("OUTPUT_DIRECTORY") or config.ConfigSectionMap("OUTPUT")['directory'];
 
@@ -118,11 +118,11 @@ def getWorkouts(email = None, password = None):
 
             if pathToToken is not None:
                 blob=bucket.blob("{0}/{1}".format(email,filename))
-                blob.upload_from_string(tcxXMLString)
+                blob.upload_from_string(tcxXMLString, content_type='text/xml')
             else:
                 Path(outputDir).mkdir(parents=True, exist_ok=True)
                 with open("{0}/{1}".format(outputDir,filename), "w") as text_file:
-                    print(tcxXMLString, file=text_file)
+                    text_file.write(tcxXMLString)
             
         except Exception as e:
             logger.error("Failed to write TCX file for workout {} - Exception: {}".format(workoutId, e))
@@ -149,5 +149,5 @@ if __name__ == "__main__":
 
     user_email = config.ConfigSectionMap("PELOTON")['email']
     user_password = config.ConfigSectionMap("PELOTON")['password']
-    
+
     getWorkouts(user_email, user_password);
