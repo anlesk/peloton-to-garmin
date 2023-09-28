@@ -92,8 +92,6 @@ jobs:
         P2G_GARMIN__EMAIL: ${{ secrets.P2G_GARMIN__EMAIL }}
         P2G_GARMIN__PASSWORD: ${{ secrets.P2G_GARMIN__PASSWORD }}
         TZ: America/Chicago
-    - run: ls -la /app/output/fit
-    
     - uses: actions/upload-artifact@v3
       if: ${{ github.event.inputs.saveLocalCopy }}
       with:
