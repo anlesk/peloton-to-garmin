@@ -87,3 +87,9 @@ jobs:
         P2G_GARMIN__EMAIL: ${{ secrets.P2G_GARMIN__EMAIL }}
         P2G_GARMIN__PASSWORD: ${{ secrets.P2G_GARMIN__PASSWORD }}
         TZ: America/Chicago
+
+    - uses: actions/upload-artifact@v3
+      if: success() || failure()
+      with:
+        name: output
+        path: app/output/*.fit
