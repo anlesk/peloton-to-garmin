@@ -9,12 +9,16 @@ on:
       workoutsToDownload:
         type: number
         default: "5"
+      environment:
+        type: string
+        default: "anlesk"
   schedule:
     - cron: '0 1 * * *'
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
     # The type of runner that the job will run on
     container: 
       image:  philosowaffle/peloton-to-garmin:stable
