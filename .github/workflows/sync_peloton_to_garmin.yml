@@ -92,4 +92,4 @@ jobs:
       if: success() || failure()
       with:
         name: output
-        path: app/output/*.fit
+        path: /app/output/*.fit
