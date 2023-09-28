@@ -9,6 +9,9 @@ on:
       workoutsToDownload:
         type: number
         default: "1"
+      saveLocalCopy:
+        type: boolean
+        default: false
       environment:
         type: string
         default: "anlesk"
@@ -23,7 +26,9 @@ jobs:
     container: 
       image:  philosowaffle/peloton-to-garmin:stable
     steps:
-    - run: mkdir -p /app/output
+    - name: Set env
+      run: echo "OUTPUT_DIR=/app/output" >> $GITHUB_ENV
+    - run: mkdir -p ${{ env.OUTPUT_DIR }}
     - name: Create device info file
       env: 
         DEVICE_INFO: ${{ secrets.DEVICE_INFO }}
@@ -47,7 +52,7 @@ jobs:
             "Fit": true,
             "Json": false,
             "Tcx": false,
-            "SaveLocalCopy": true,
+            "SaveLocalCopy": ${{ github.event.inputs.saveLocalCopy }},
             "IncludeTimeInHRZones": false,
             "IncludeTimeInPowerZones": false,
             "DeviceInfoPath": "./deviceInfo.xml"
@@ -90,7 +95,7 @@ jobs:
     - run: ls -la /app/output/fit
     
     - uses: actions/upload-artifact@v3
-      if: success() || failure()
+      if: ${{ github.event.inputs.saveLocalCopy }}
       with:
         name: output
-        path: /app/output/fit/*.fit
+        path: ${{ env.OUTPUT_DIR }}/fit/*.fit
