@@ -12,18 +12,15 @@ on:
       saveLocalCopy:
         type: boolean
         default: false
-  schedule:
-    - cron: '0 1 * * *'
+      environment:
+        type: environment
+
+run-name: Sync peloton to garmin for ${{ inputs.environment }}
 
 jobs:
   sync:
-    strategy:
-      matrix:
-        include:
-          - env: anlesk
-          - env: jane
     runs-on: ubuntu-latest
-    environment: ${{ matrix.env }}
+    environment: ${{ github.event.inputs.environment }}
     # The type of runner that the job will run on
     container: 
       image:  philosowaffle/peloton-to-garmin:stable
