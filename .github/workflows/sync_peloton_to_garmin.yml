@@ -96,6 +96,7 @@ jobs:
     - name: archive files
       if: ${{ github.event.inputs.saveLocalCopy }}
       run: |
+        apt-get update
         apt-get install -y zip
         zip -r output.zip ${{ env.OUTPUT_DIR }}
         
