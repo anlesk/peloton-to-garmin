@@ -92,6 +92,12 @@ jobs:
         P2G_GARMIN__PASSWORD: ${{ secrets.P2G_GARMIN__PASSWORD }}
         TZ: America/Chicago
 
+    - run: |
+        ls -la
+        ls -la /app
+        ls -la /app/output
+        ls -la ${{ env.OUTPUT_DIR }}
+        ls -la ${{ env.OUTPUT_DIR }}/fit
     - name: zip output files
       if: ${{ github.event.inputs.saveLocalCopy }}
       uses: papeloto/action-zip@v1
