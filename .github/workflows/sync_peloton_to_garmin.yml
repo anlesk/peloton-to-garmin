@@ -92,18 +92,14 @@ jobs:
         P2G_GARMIN__PASSWORD: ${{ secrets.P2G_GARMIN__PASSWORD }}
         TZ: America/Chicago
 
-    - run: |
-        ls -la ${{ env.OUTPUT_DIR }}
-        ls -la ${{ env.OUTPUT_DIR }}/fit
+
+    - name: archive files
+      if: ${{ github.event.inputs.saveLocalCopy }}
+      run: |
+        sudo apt-get install -y zip
+        zip -r output.zip ${{ env.OUTPUT_DIR }}
         
-    - name: zip output files
-      if: ${{ github.event.inputs.saveLocalCopy }}
-      uses: vimtor/action-zip@v1
-      with:
-        files: ${{ env.OUTPUT_DIR }}/fit
-        dest: output.zip
     - uses: actions/upload-artifact@v3
-      if: ${{ github.event.inputs.saveLocalCopy }}
       with:
         name: output
         path: output.zip
