@@ -93,19 +93,14 @@ jobs:
         TZ: America/Chicago
 
     - run: |
-        ls -la
-        ls -la /app
-        ls -la /app/output
         ls -la ${{ env.OUTPUT_DIR }}
         ls -la ${{ env.OUTPUT_DIR }}/fit
-    
-    - uses: actions/checkout@v4
-      if: ${{ github.event.inputs.saveLocalCopy }}
+        
     - name: zip output files
       if: ${{ github.event.inputs.saveLocalCopy }}
-      uses: papeloto/action-zip@v1
+      uses: vimtor/action-zip@v1
       with:
-        files: ${{ env.OUTPUT_DIR }}
+        files: ${{ env.OUTPUT_DIR }}/fit
         dest: output.zip
     - uses: actions/upload-artifact@v3
       if: ${{ github.event.inputs.saveLocalCopy }}
