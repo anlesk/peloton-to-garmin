@@ -98,6 +98,9 @@ jobs:
         ls -la /app/output
         ls -la ${{ env.OUTPUT_DIR }}
         ls -la ${{ env.OUTPUT_DIR }}/fit
+    
+    - uses: actions/checkout@v4
+      if: ${{ github.event.inputs.saveLocalCopy }}
     - name: zip output files
       if: ${{ github.event.inputs.saveLocalCopy }}
       uses: papeloto/action-zip@v1
