@@ -96,7 +96,7 @@ jobs:
     - name: archive files
       if: ${{ github.event.inputs.saveLocalCopy }}
       run: |
-        sudo apt-get install -y zip
+        apt-get install -y zip
         zip -r output.zip ${{ env.OUTPUT_DIR }}
         
     - uses: actions/upload-artifact@v3
